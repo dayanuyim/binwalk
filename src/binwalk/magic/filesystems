@@ -1,30 +1,27 @@
 #--------------------File Systems---------------------
 
+# TODO please correct Minix detection by file (https://github.com/file/file/blob/master/magic/Magdir/filesystems)
 # Minix filesystems
-0x410   string      \x7f\x13\x00\x00\x00\x00    Minix filesystem, V1, little endian,
+0x410   string      \x7f\x13                    Minix filesystem, V1, little endian,
 >0x402  beshort     x                           %d zones
->0x402  beshort     <1                          \b, invalid zone count {invalid}
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
 >>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
 
-0x410   string      \x13\x7f\x00\x00\x00\x00    Minix filesystem, V1, big endian,
+0x410   string      \x13\x7f                    Minix filesystem, V1, big endian,
 >0x402  beshort     x                           %d zones
->0x402  beshort     <1                          \b, invalid zone count {invalid}
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
 >>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
 
-0x410   string      \x8f\x13\x00\x00\x00\x00    Minix filesystem, V1, little endian, 30 char names,
+0x410   string      \x8f\x13                    Minix filesystem, V1, little endian, 30 char names,
 >0x402  beshort     x                           %d zones
->0x402  beshort     <1                          \b, invalid zone count {invalid}
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
 >>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
 
-0x410   string      \x13\x8f\x00\x00\x00\x00    Minix filesystem, V1, big endian, 30 char names,
+0x410   string      \x13\x8f                    Minix filesystem, V1, big endian, 30 char names,
 >0x402  beshort     x                           %d zones
->0x402  beshort     <1                          \b, invalid zone count {invalid}
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
 >>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
@@ -631,8 +628,8 @@
 >6148   string        1                                             version 1.0,
 >6148   string        2                                             version 2.0,
 >6148   string        3                                             version 3.0
->6148   byte          >0x33                                         {invalid} version,
->6148   byte          <0x31                                         {invalid} version,
+>6148   byte          >0x33                                         invalid version 0x%X,
+>6148   byte          <0x31                                         invalid version 0x%X,
 >38     byte          !0
 >>38    string        x                                             volume name: "%s",
 >2047   string        \000CD001\001EL\x20TORITO\x20SPECIFICATION    bootable
@@ -679,7 +676,7 @@
 >8       lelong*1024   x                {jump:%d}
 >8       lelong        x                total blocks: %d,
 >972     lelong        x                free blocks: %d,
->968     uledate        x                last modified: %s
+>968     uledate       x                last modified: %s
 >980     byte          !0
 >>980    string        x                \b, last mounted on: "%s"
 
@@ -722,3 +719,20 @@
 >6      byte&0x1c 0x08                                              LZO-compressed,
 >6      byte&0x1c 0x0c                                              UCL-compressed,
 >4      uleshort   x                                                version: %d
+
+# Phantom DJI firmware
+0       string     \x78\x56\x34\x12\x01\x00    DJI firmware,
+>10     uleshort   x                           version 0x%X,
+>12     string     x                           Phantom %s
+>28     string     x                           %s,
+>44     uleshort   x                           %d seek rows
+
+# Parrot Firmware
+0       string     PLF!                        Parrot Firmware,
+>4      ulelong    x                           version: %u,
+>8      ulelong    x                           size: %u,
+>12     ulelong    x                           entry size: %u,
+>36     ulelong    x                           firmware version: %u.
+>40     ulelong    x                           \b%u.
+>44     ulelong    x                           \b%u,
+>52     ulelong    x                           file size: %u
