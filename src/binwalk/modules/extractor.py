@@ -884,13 +884,22 @@ class Extractor(Module):
                     # command with fname
                     command = command.strip().replace(self.FILE_NAME_PLACEHOLDER, fname)
 
-                    binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
-                    rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
+                    ################################################################
+                    root_dir = re.search('[a-zA-Z]+-root(-[0-9]+)?', command, re.IGNORECASE)
+                    log_name = root_dir.group() if root_dir else None  # no root dir -> no extractor -> not need to log
 
-                    if rval in codes:
-                        retval = True
-                    else:
-                        retval = False
+                    std_re = subprocess.PIPE if log_name else tmp
+                    binwalk.core.common.debug("subprocess.run(%s, stdout=%s, stderr=%s)" % (command, str(std_re), str(std_re)))
+                    resp = subprocess.run(shlex.split(command), stdout=std_re, stderr=std_re)
+                    rval = resp.returncode
+                    retval = rval in codes
+
+                    if log_name:
+                        with open('.%s.stdout.log' % log_name, 'w') as f:
+                            f.write(str(resp.stdout, 'utf-8'))
+                        with open('.%s.stderr.log' % log_name, 'w') as f:
+                            f.write(str(resp.stderr, 'utf-8'))
+                    ################################################################
 
                     binwalk.core.common.debug('External extractor command "%s" completed with return code %d (success: %s)' % (cmd, rval, str(retval)))
                     command_list.append(command)
